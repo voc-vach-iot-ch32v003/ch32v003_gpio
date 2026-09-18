@@ -77,28 +77,52 @@ uint8_t digitalReadPort(const GPIO_TypeDef* GPIOx, const uint8_t pinNumber)
 
 void decodeHardwarePin(const uint8_t mcuPin, GPIO_TypeDef** GPIOx, uint8_t* pinNumber)
 {
-    *pinNumber = mcuPin & 0x0F;
-    const uint8_t portIdx = mcuPin >> 4;
-    *GPIOx = (portIdx == 0) ? GPIOA : ((portIdx == 1) ? GPIOC : GPIOD);
+    *pinNumber = (uint8_t)MCU_PIN_GET_NUM(mcuPin);
+
+    switch (MCU_PIN_GET_PORT(mcuPin))
+    {
+    case MCU_PORT_INDEX_A: *GPIOx = GPIOA;
+        break;
+    case MCU_PORT_INDEX_C: *GPIOx = GPIOC;
+        break;
+    default: *GPIOx = GPIOD;
+        break; /* MCU_PORT_INDEX_D */
+    }
 }
 
 void pinMode(const uint8_t mcuPin, const PinMode_t mode)
 {
+    if (!MCU_PIN_IS_GPIO(mcuPin))
+    {
+        return; // Không phải chân GPIO, bỏ qua
+    }
     EXECUTE_ON_PIN(mcuPin, pinModePort, mode);
 }
 
 void digitalWrite(const uint8_t mcuPin, const DigitalState_t state)
 {
+    if (!MCU_PIN_IS_GPIO(mcuPin))
+    {
+        return; // Không phải chân GPIO, bỏ qua
+    }
     EXECUTE_ON_PIN(mcuPin, digitalWritePort, state);
 }
 
 void digitalToggle(const uint8_t mcuPin)
 {
+    if (!MCU_PIN_IS_GPIO(mcuPin))
+    {
+        return; // Không phải chân GPIO, bỏ qua
+    }
     EXECUTE_ON_PIN(mcuPin, digitalTogglePort);
 }
 
 DigitalState_t digitalRead(const uint8_t mcuPin)
 {
+    if (!MCU_PIN_IS_GPIO(mcuPin))
+    {
+        return LOW; // Không phải chân GPIO, trả về LOW
+    }
     return EXECUTE_ON_PIN_RET(mcuPin, digitalReadPort) == 0 ? LOW : HIGH;
 }
 
