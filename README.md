@@ -1,5 +1,10 @@
 # 🔌 ch32v003_gpio
 
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![PlatformIO](https://img.shields.io/badge/PlatformIO-Supported-orange.svg)
+![Framework](https://img.shields.io/badge/Framework-ch32v003fun-green.svg)
+![MCU](https://img.shields.io/badge/MCU-CH32V003-red.svg)
+
 Thư viện quản lý và điều khiển GPIO nâng cao theo phong cách Arduino dành cho vi điều khiển **CH32V003**. Thư viện hoạt động trên nền framework **ch32v003fun**, hỗ trợ tự động giải mã chân vật lý theo từng gói vỏ đóng gói (`SOP8`, `SOP16`, `TSSOP20`), tự động cấp xung nhịp (Clock Tree), cung cấp các API làm việc trực tiếp theo Port và quản lý nâng cao chân nạp SWIO (PD1).
 
 ---
@@ -14,33 +19,14 @@ Thư viện quản lý và điều khiển GPIO nâng cao theo phong cách Ardui
 
 ---
 
-## 📑 Cấu trúc hàm (API Reference)
+## 📦 Cài đặt (Installation)
 
-### 1. API chuẩn phong cách Arduino (Truyền chân vật lý `MCU_PINx`)
+Thêm thư viện vào project PlatformIO của bạn qua cờ `lib_deps`, trỏ trực tiếp tới URL Git của Repo:
 
-| Hàm xử lý                         | Tham số                                  | Giá trị trả về   | Mô tả                                                                                  |
-| --------------------------------- | ---------------------------------------- | ---------------- | -------------------------------------------------------------------------------------- |
-| **`pinMode(mcuPin, mode)`**       | `uint8_t mcuPin`, `PinMode_t mode`       | `void`           | Cấu hình chế độ (Input, Push-Pull, Open-Drain, Alternate Function...) cho chân vật lý. |
-| **`digitalWrite(mcuPin, state)`** | `uint8_t mcuPin`, `DigitalState_t state` | `void`           | Xuất mức logic (`HIGH` / `LOW`) ra chân vật lý.                                        |
-| **`digitalRead(mcuPin)`**         | `uint8_t mcuPin`                         | `DigitalState_t` | Đọc mức logic hiện tại của chân vật lý (`HIGH` hoặc `LOW`).                            |
-| **`digitalToggle(mcuPin)`**       | `uint8_t mcuPin`                         | `void`           | Đảo ngược trạng thái logic đầu ra của chân vật lý.                                     |
-
-### 2. API làm việc trực tiếp theo Cổng Port (Tốc độ cao)
-
-| Hàm xử lý                                       | Tham số                                                      | Giá trị trả về | Mô tả                                                                                           |
-| ----------------------------------------------- | ------------------------------------------------------------ | -------------- | ----------------------------------------------------------------------------------------------- |
-| **`pinModePort(GPIOx, pinNumber, mode)`**       | `GPIO_TypeDef* GPIOx`, `uint8_t pinNumber`, `PinMode_t mode` | `void`         | Cấu hình chế độ cho chân theo chỉ số bit (0-7) trực tiếp trên Port (`GPIOA`, `GPIOC`, `GPIOD`). |
-| **`digitalWritePort(GPIOx, pinNumber, state)`** | `GPIO_TypeDef* GPIOx`, `uint8_t pinNumber`, `uint8_t state`  | `void`         | Xuất mức logic ra chân theo Port bằng thanh ghi `BSHR`/`BCR`.                                   |
-| **`digitalReadPort(GPIOx, pinNumber)`**         | `const GPIO_TypeDef* GPIOx`, `uint8_t pinNumber`             | `uint8_t`      | Đọc trực tiếp bit trạng thái đầu vào từ thanh ghi `INDR`.                                       |
-| **`digitalTogglePort(GPIOx, pinNumber)`**       | `GPIO_TypeDef* GPIOx`, `uint8_t pinNumber`                   | `void`         | Đảo trạng thái pin trực tiếp trên Port chỉ định.                                                |
-
-### 3. API Quản lý chân gỡ lỗi / nạp chương trình (SWIO)
-
-| Hàm xử lý                   | Tham số               | Giá trị trả về | Mô tả                                                                               |
-| --------------------------- | --------------------- | -------------- | ----------------------------------------------------------------------------------- |
-| **`setSwioMode(swioMode)`** | `SwioMode_t swioMode` | `void`         | Thiết lập chế độ nạp `SWIO_MODE_DEBUG` hoặc giải phóng thành GPIO `SWIO_MODE_GPIO`. |
-| **`getSwioMode()`**         | Không có              | `SwioMode_t`   | Trả về chế độ hoạt động hiện tại của chân SWIO (PD1).                               |
-| **`toggleSwioMode()`**      | Không có              | `void`         | Đảo chuyển đổi giữa chế độ nạp chương trình và GPIO thường.                         |
+```ini
+lib_deps =
+    https://github.com/voc-vach-iot-ch32v003/ch32v003_gpio.git
+```
 
 ---
 
@@ -57,14 +43,13 @@ build_flags = -DCH32V003_A4M6
 
 ; 3. Bản TSSOP20 (20 chân)
 build_flags = -DCH32V003_F4P6
-
 ```
 
 _(Mặc định nếu không khai báo cờ nào, thư viện sẽ tự động chọn bản SOP8 `CH32V003_J4M6`)._
 
 ---
 
-## 📝 Code mẫu sử dụng
+## 📝 Code mẫu sử dụng (Quick Start)
 
 ```c
 #include "ch32fun.h"
@@ -101,7 +86,57 @@ int main() {
         loop();
     }
 }
-
 ```
 
 ---
+
+## 📁 Danh sách Ví dụ mẫu (Examples)
+
+| Dự án ví dụ                                                          | Mô tả chức năng                                                                                                             |
+| :------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------- |
+| [`01_gpio_basic_blink_button`](examples/01_gpio_basic_blink_button/) | Project chạy được ngay: Blink LED kết hợp đọc nút nhấn Pull-up có chống dội.                                                |
+| [`02_swio_remap_safety`](examples/02_swio_remap_safety/)             | Giải phóng an toàn chân nạp SWIO (PD1) thành GPIO bằng cơ chế "giữ nút để giải phóng", kèm cảnh báo và hướng dẫn khôi phục. |
+| [`03_port_level_fast_toggle`](examples/03_port_level_fast_toggle/)   | So sánh tốc độ giữa API Arduino-style (`digitalToggle`) và API cấp Port (`digitalTogglePort`) bằng benchmark chu kỳ CPU.    |
+
+---
+
+## 📑 Tra cứu API (API Reference)
+
+### 1. API chuẩn phong cách Arduino (Truyền chân vật lý `MCU_PINx`)
+
+| Hàm xử lý                         | Tham số                                  | Giá trị trả về   | Mô tả                                                                                  |
+| --------------------------------- | ---------------------------------------- | ---------------- | -------------------------------------------------------------------------------------- |
+| **`pinMode(mcuPin, mode)`**       | `uint8_t mcuPin`, `PinMode_t mode`       | `void`           | Cấu hình chế độ (Input, Push-Pull, Open-Drain, Alternate Function...) cho chân vật lý. |
+| **`digitalWrite(mcuPin, state)`** | `uint8_t mcuPin`, `DigitalState_t state` | `void`           | Xuất mức logic (`HIGH` / `LOW`) ra chân vật lý.                                        |
+| **`digitalRead(mcuPin)`**         | `uint8_t mcuPin`                         | `DigitalState_t` | Đọc mức logic hiện tại của chân vật lý (`HIGH` hoặc `LOW`).                            |
+| **`digitalToggle(mcuPin)`**       | `uint8_t mcuPin`                         | `void`           | Đảo ngược trạng thái logic đầu ra của chân vật lý.                                     |
+
+### 2. API làm việc trực tiếp theo Cổng Port (Tốc độ cao)
+
+| Hàm xử lý                                       | Tham số                                                      | Giá trị trả về | Mô tả                                                                                           |
+| ----------------------------------------------- | ------------------------------------------------------------ | -------------- | ----------------------------------------------------------------------------------------------- |
+| **`pinModePort(GPIOx, pinNumber, mode)`**       | `GPIO_TypeDef* GPIOx`, `uint8_t pinNumber`, `PinMode_t mode` | `void`         | Cấu hình chế độ cho chân theo chỉ số bit (0-7) trực tiếp trên Port (`GPIOA`, `GPIOC`, `GPIOD`). |
+| **`digitalWritePort(GPIOx, pinNumber, state)`** | `GPIO_TypeDef* GPIOx`, `uint8_t pinNumber`, `uint8_t state`  | `void`         | Xuất mức logic ra chân theo Port bằng thanh ghi `BSHR`/`BCR`.                                   |
+| **`digitalReadPort(GPIOx, pinNumber)`**         | `const GPIO_TypeDef* GPIOx`, `uint8_t pinNumber`             | `uint8_t`      | Đọc trực tiếp bit trạng thái đầu vào từ thanh ghi `INDR`.                                       |
+| **`digitalTogglePort(GPIOx, pinNumber)`**       | `GPIO_TypeDef* GPIOx`, `uint8_t pinNumber`                   | `void`         | Đảo trạng thái pin trực tiếp trên Port chỉ định.                                                |
+
+### 3. API Quản lý chân gỡ lỗi / nạp chương trình (SWIO)
+
+| Hàm xử lý                   | Tham số               | Giá trị trả về | Mô tả                                                                               |
+| --------------------------- | --------------------- | -------------- | ----------------------------------------------------------------------------------- |
+| **`setSwioMode(swioMode)`** | `SwioMode_t swioMode` | `void`         | Thiết lập chế độ nạp `SWIO_MODE_DEBUG` hoặc giải phóng thành GPIO `SWIO_MODE_GPIO`. |
+| **`getSwioMode()`**         | Không có              | `SwioMode_t`   | Trả về chế độ hoạt động hiện tại của chân SWIO (PD1).                               |
+| **`toggleSwioMode()`**      | Không có              | `void`         | Đảo chuyển đổi giữa chế độ nạp chương trình và GPIO thường.                         |
+
+### 4. API Nội bộ / Tiện ích giải mã (Internal Helper)
+
+| Hàm xử lý                                         | Tham số                                                        | Giá trị trả về | Mô tả                                                                            |
+| ------------------------------------------------- | -------------------------------------------------------------- | -------------- | -------------------------------------------------------------------------------- |
+| **`decodeHardwarePin(mcuPin, GPIOx, pinNumber)`** | `uint8_t mcuPin`, `GPIO_TypeDef** GPIOx`, `uint8_t* pinNumber` | `void`         | Giải mã `mcuPin` (đã bit-pack) thành cặp `(Port, PinNumber)` cấp thấp tương ứng. |
+
+---
+
+## 📄 Giấy phép (License) & Tác giả
+
+- **Tác giả:** [Vọc Vạch IoT](https://github.com/voc-vach-iot)
+- **Giấy phép:** Phát hành theo giấy phép [MIT License](LICENSE).

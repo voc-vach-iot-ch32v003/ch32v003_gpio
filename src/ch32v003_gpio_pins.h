@@ -3,8 +3,6 @@
  * @author  Vọc Vạch IoT
  * @brief   Định nghĩa sơ đồ chân vật lý (MCU_Pin_t) và chân chức năng đặc biệt
  *          (MCU_SpecialPin_t) cho CH32V003.
- * @version 1.0.0
- * @date    2026-06-07
  *
  * ---------------------------------------------------------------------------
  * QUY ƯỚC MÃ HÓA:      MCU_PIN = (Chỉ số Port << 4) | Chỉ số Pin
